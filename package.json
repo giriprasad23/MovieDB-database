@@ -1,0 +1,15 @@
+{
+  "name": "axk5198_wdmphase3",
+  "version": "1.0.0",
+  "description": "To make AJAX calls to server side and load data to user browser screen using animations",
+  "main": "server_side.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Atul Konaje",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.12.3",
+    "mongodb": "^2.0.28"
+  }
+}

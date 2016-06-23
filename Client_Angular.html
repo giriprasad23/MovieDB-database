@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Axk5198 Project Phase3</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="scaling.css">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+</head>
+
+<body style="background:#80BFFF">
+
+<div ng-app="tabLoad" class ="container">
+    <div ng-controller="tabCtrl" class ="container" bgcolor=#bc8f8f>
+        <pre ng-show="donemsg" style="opacity:0.8;background:#80BFFF;margin-top:20%;margin-left: 50%;margin-right: 50%" class="zoom">Animation is Finished</pre>
+        <table ng-show="tabvisible" style="margin-left: 30%;margin-right: 50%" class ="table table-hover">
+            <th class="scaling">{{header}}</th>
+        </table>
+        <button ng-show="buttonshow" type ="button" style="margin-left: 40%;margin-right: 50%" class="btn btn-primary" ng-click="startAnimation()">Get Movie list!!</button>
+        </div>
+</div>
+
+
+<script>
+
+
+    var app = angular.module("tabLoad",[]);
+
+    app.controller("tabCtrl",function($scope,$http,$interval) {
+        //Make Visibility of the Done message as false to display at end
+        $scope.donemsg=false;
+        $scope.movie = "";
+        $scope.header = "Movies";
+        $scope.tabvisible = false;
+        $scope.buttonshow= true;
+        //Function called when the button is clicked
+        $scope.startAnimation =function(){
+            //hide the button
+            $scope.buttonshow= false;
+            var j=0;
+            //USE interval method to make AJAX calls to server every 0.5 seconds
+            var interv=$interval(anim,500,100,true,j++);
+            $scope.tabvisible = true;
+
+            var intro =[];
+
+            function anim (i) {
+                var url ='/loaddata?i='+i;
+                //Make an AJAX request to server,requesting for data from database
+                $http.get(url).success(function (data) {
+
+                    if(i < 20) {
+                        //Display the database record received in the response of AJAX request  with 20 records displayed at a time
+                        intro [i] = d3.select("body").select("table").select("tbody").append("tr").append("td").attr("class","scaling").text("Movie: "+data.title+"...YEAR : "+data.year+"...Rating:"+data.rating).style("opacity", 0.0);
+                        //Use opacity for fading animation effect
+                        intro[i].transition().duration(2500).style("opacity", 1.0);
+                    }else if(i >= 21){
+                            //get the reference of the table data elements to remove the older records and add the newly received data
+                            while(i >= 20)
+                            {
+                                i=i%20;
+                            }
+                            intro[i].text("Movie: "+data.title+"...YEAR : "+data.year+"...Rating:"+data.rating).style("opacity", 0.0);
+                            intro[i].transition().duration(2500).style("opacity", 1.0);
+
+                    }
+                });
+            }
+            //After the 100 AJAX requests , run the below function
+            interv.then(function(){
+                $scope.header = "";
+                //Display the Successful finished message
+                 $scope.donemsg=true;
+                for(i=0;i<20;i++)
+                {
+                     intro[i].transition().duration(1000).style("opacity",0.1);
+                }
+
+            });
+
+        }
+
+    });
+
+</script>
+</body>
+</html>
